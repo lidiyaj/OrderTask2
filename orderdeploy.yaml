@@ -30,6 +30,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: order
+  annotations:
+   konghq.com/plugins: twelve-per-min
 spec:
   type: NodePort
   selector:
