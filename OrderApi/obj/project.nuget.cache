@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "AfO9MZ5SWsZb0JsyYR0AMGUCUygm+sDVh+0joKMmgNyT6KvKsX1hI4UdbWzGFeCv3XGTNh3+ewNElMsRaOuYXw==",
+  "dgSpecHash": "0TtHEXq9xoQE3X/TPL1gvFhnhKPNE9EnfGASOxtJhXC2m9ko6p21GR0MyAM6VH4vpUSvM+iVSL4uDhX9SnFnOw==",
   "success": true,
   "projectFilePath": "D:\\Lidiya\\Assessment3\\OrderTask2\\OrderApi\\OrderApi.csproj",
   "expectedPackageFiles": [
@@ -24,6 +24,7 @@
     "C:\\Users\\dockeruser\\.nuget\\packages\\microsoft.extensions.primitives\\5.0.0\\microsoft.extensions.primitives.5.0.0.nupkg.sha512",
     "C:\\Users\\dockeruser\\.nuget\\packages\\microsoft.openapi\\1.2.3\\microsoft.openapi.1.2.3.nupkg.sha512",
     "C:\\Users\\dockeruser\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.11.1\\microsoft.visualstudio.azure.containers.tools.targets.1.11.1.nupkg.sha512",
+    "C:\\Users\\dockeruser\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
     "C:\\Users\\dockeruser\\.nuget\\packages\\rabbitmq.client\\6.2.2\\rabbitmq.client.6.2.2.nupkg.sha512",
     "C:\\Users\\dockeruser\\.nuget\\packages\\swashbuckle.aspnetcore\\5.6.3\\swashbuckle.aspnetcore.5.6.3.nupkg.sha512",
     "C:\\Users\\dockeruser\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\5.6.3\\swashbuckle.aspnetcore.swagger.5.6.3.nupkg.sha512",

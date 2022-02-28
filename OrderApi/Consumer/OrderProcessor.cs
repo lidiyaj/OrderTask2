@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using OrderApi.Models;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -22,6 +23,8 @@ namespace OrderApi.Consumer
         public OrderProcessor(ILoggerFactory loggerFactory, IServiceScopeFactory serviceScopeFactory)
         {
             this._logger = loggerFactory.CreateLogger<OrderProcessor>();
+            _serviceScopeFactory = serviceScopeFactory;
+
             InitRabbitMQ();
         }
 
@@ -52,10 +55,11 @@ namespace OrderApi.Consumer
             consumer.Received += (ch, ea) =>
             {
                 // received message  
-                var content = System.Text.Encoding.UTF8.GetString(ea.Body.ToArray());
+                var body = ea.Body.ToArray();
+                var message = Encoding.UTF8.GetString(body);
 
                 // handle the received message  
-                HandleMessageAsync(content);
+                HandleMessageAsync(message);
                 _channel.BasicAck(ea.DeliveryTag, false);
             };
 
@@ -68,49 +72,51 @@ namespace OrderApi.Consumer
             return Task.CompletedTask;
         }
 
-        private async Task HandleMessageAsync(string content)
+        private async Task HandleMessageAsync(string message)
         {
             // we just print this message   
-            _logger.LogInformation($"consumer received {content}");
+            _logger.LogInformation($"consumer received {message}");
 
-            string[] tokens = content.Split("=");
-            string[] cartId = tokens[1].Split(",");
-            string[] orderId = tokens[2].Split(",");
-            string[] status = tokens[3].Split(",");
-            string[] products = tokens[4].Split(",");
-            _logger.LogInformation($"after received {cartId[0]}");
-            _logger.LogInformation($"Processing cart order... {cartId[0]} ");
+            CartOrder orderMsg = JsonConvert.DeserializeObject<CartOrder>(message);
+
+            _logger.LogInformation($"after received {orderMsg.OrderID}");
+            _logger.LogInformation($"Processing order... {orderMsg.OrderID} ");
 
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 var _context = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
 
-                var order = await _context.Orders.FindAsync(Convert.ToInt32(orderId));
+                var order = await _context.Orders.FindAsync(orderMsg.OrderID);
                 if (order != null)
                 {
-                    order.OrderStatus = nameof(OrderStatus.SUCCESS);
-
-                    _logger.LogInformation("Order with OrderId: " + orderId + " updated to :" + order.OrderStatus);
-
-                    _context.Orders.Update(order);
-
-                    //foreach(var product in products)
-                    //{
-                    //    var orderItem = new OrderItem();
-
-                    //    orderItem.OrderID = Convert.ToInt32(orderId);
-                    //    orderItem.ProductID = product.ProductID;
-
-                    //}
-                    await _context.SaveChangesAsync();
+                    _logger.LogInformation("Order with OrderId: " + orderMsg.OrderID + " exists.");
                 }
                 else
                 {
-                    order.OrderStatus = nameof(OrderStatus.FAILED);
+                    Order neworder = new()
+                    {
+                        OrderStatus = nameof(OrderStatus.INITIATED),
+                        CustomerID = orderMsg.CustomerID
+                    };
 
-                    _logger.LogInformation("Order with OrderId: " + orderId + " updated to :" + order.OrderStatus);
+                    _context.Orders.Add(neworder);
+                    await _context.SaveChangesAsync();
 
-                    _context.Orders.Update(order);
+                    _logger.LogInformation("Order with OrderId: " + neworder.OrderID + " created.");
+
+                    foreach (var product in orderMsg.Products)
+                    {
+                        var orderItem = new OrderItem
+                        {
+                            OrderID = order.OrderID,
+                            ProductID = product.ProductID,
+                            Quantity = product.Quantity,
+                            ProductPrice = product.ProductPrice,
+                            Total = product.Total
+                        };
+
+                        _context.OrderItems.Add(orderItem);
+                    }
                     await _context.SaveChangesAsync();
                 }
             }
