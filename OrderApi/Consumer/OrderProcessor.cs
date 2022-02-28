@@ -95,8 +95,8 @@ namespace OrderApi.Consumer
                 {
                     Order neworder = new()
                     {
-                        OrderStatus = nameof(OrderStatus.INITIATED),
-                        CustomerID = orderMsg.CustomerID
+                        CustomerID = orderMsg.CustomerID,
+                        CartID = orderMsg.CartID
                     };
 
                     _context.Orders.Add(neworder);

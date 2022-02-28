@@ -6,7 +6,7 @@ namespace OrderApi.Models
     {
         public int OrderID { get; set; }
         public int CustomerID { get; set; }
-        public string OrderStatus { get; set; }
+        public int CartID { get; set; }
     }
 
     public class OrderItem
@@ -22,6 +22,7 @@ namespace OrderApi.Models
     public class CartOrder
     {
         public int OrderID { get; set; }
+        public int CartID { get; set; }
         public int CustomerID { get; set; }
         public List<Product> Products { get; set; }
     }
